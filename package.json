@@ -1,0 +1,23 @@
+{
+  "name": "financial-transfer-system",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "backend:dev": "turbo run dev --filter=backend",
+    "frontend:dev": "turbo run dev --filter=frontend"
+  },
+  "devDependencies": {
+    "@turbo/gen": "^2.3.3",
+    "turbo": "^2.3.3"
+  },
+  "packageManager": "npm@10.9.2",
+  "engines": {
+    "node": ">=24"
+  }
+}
