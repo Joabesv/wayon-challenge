@@ -48,6 +48,9 @@
                       <FormLabel>Conta de Origem</FormLabel>
                       <FormControl>
                         <Input
+                          type="tel"
+                          inputmode="numeric"
+                          pattern="[0-9]*"
                           placeholder="0000000000"
                           maxlength="10"
                           v-bind="componentField"
@@ -63,6 +66,9 @@
                       <FormLabel>Conta de Destino</FormLabel>
                       <FormControl>
                         <Input
+                          type="tel"
+                          inputmode="numeric"
+                          pattern="[0-9]*"
                           placeholder="0000000000"
                           maxlength="10"
                           v-bind="componentField"
@@ -81,6 +87,7 @@
                       <FormControl>
                         <Input
                           type="number"
+                          inputmode="decimal"
                           placeholder="0.01"
                           :min="0.01"
                           :step="0.01"
