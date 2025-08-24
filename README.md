@@ -230,7 +230,4 @@ permite a melhor visualização de logs estruturados.
 - [ ] Adicionar autenticação/autorização
 - [ ] Dockerização das aplicações
 - [ ] Pipeline CI/CD
-- [ ] Validações mais robustas
-- [ ] Tratamento de erro mais específico
-- [ ] Logs estruturados
 - [ ] Métricas e monitoramento
