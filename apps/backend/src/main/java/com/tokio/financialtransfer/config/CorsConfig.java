@@ -22,7 +22,7 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowedOriginPatterns("*") // Allow any origin pattern for development
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
-                .allowCredentials(true)
+                .allowCredentials(false) // Disable credentials to allow wildcard origins
                 .maxAge(3600);
     }
 
@@ -39,8 +39,8 @@ public class CorsConfig implements WebMvcConfigurer {
         // Allow all headers
         configuration.setAllowedHeaders(Arrays.asList("*"));
         
-        // Allow credentials
-        configuration.setAllowCredentials(true);
+        // Disable credentials for development to allow wildcard origins
+        configuration.setAllowCredentials(false);
         
         // Cache preflight response for 1 hour
         configuration.setMaxAge(3600L);

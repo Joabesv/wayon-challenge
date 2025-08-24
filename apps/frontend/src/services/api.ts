@@ -1,9 +1,30 @@
 import { ofetch } from 'ofetch'
 
-const baseURL = import.meta.env.BASE_URL ?? 'http://localhost:8080/api'
+const getApiBaseUrl = () => {
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL
+  }
+  
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname
+    const protocol = window.location.protocol
+    // If accessing via IP address (mobile), use the same IP for API
+    return `${protocol}//${hostname}:8080/api`
+  }
+  
+  return 'http://localhost:8080/api'
+}
 
 const api = ofetch.create({
-  baseURL,
+  baseURL: getApiBaseUrl(),
+  retry: 2,
+  retryDelay: 1000,
+  onRequestError({ error }) {
+    console.error('API Request Error:', error)
+  },
+  onResponseError({ response, error }) {
+    console.error('API Response Error:', response?.status, error)
+  }
 })
 
 type BaseApiResponse<T> = {

@@ -21,7 +21,6 @@ import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/transfers")
-@CrossOrigin(origins = "*", maxAge = 3600)
 @Validated
 @RequiredArgsConstructor
 @Slf4j
