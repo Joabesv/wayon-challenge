@@ -32,9 +32,20 @@
       <div class="px-4 py-6 sm:px-0">
         <Card class="max-w-6xl mx-auto">
           <CardHeader>
-            <CardTitle class="text-2xl">
-              Extrato de Transferências
-            </CardTitle>
+            <div class="flex justify-between items-center">
+              <CardTitle class="text-2xl">
+                Extrato de Transferências
+              </CardTitle>
+              <Button 
+                v-if="transfers?.length"
+                variant="outline" 
+                @click="downloadCSV"
+                class="flex items-center gap-2"
+              >
+                <DownloadIcon class="h-4 w-4" />
+                Baixar CSV
+              </Button>
+            </div>
           </CardHeader>
           
           <CardContent>
@@ -164,10 +175,11 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { DownloadIcon } from 'lucide-vue-next'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Toaster } from 'vue-sonner'
+import { Toaster, toast } from 'vue-sonner'
 
 import { useTransfers } from '@/services/queries'
 
@@ -230,5 +242,67 @@ const getStatusText = (transferDate: string): string => {
   } 
 
   return 'Agendada'
+}
+
+const downloadCSV = () => {
+  if (!transfers.value?.length) {
+    toast.error('Nenhuma transferência para exportar')
+    return
+  }
+
+  try {
+    // Define CSV headers
+    const headers = [
+      'ID',
+      'Conta Origem',
+      'Conta Destino', 
+      'Valor (R$)',
+      'Taxa (R$)',
+      'Data da Transferência',
+      'Data do Agendamento',
+      'Status'
+    ]
+
+    // Convert transfers to CSV rows
+    const csvRows = transfers.value.map((transfer: Transfer) => [
+      transfer.id.toString(),
+      formatAccount(transfer.sourceAccount),
+      formatAccount(transfer.destinationAccount),
+      transfer.transferAmount.toFixed(2).replace('.', ','),
+      transfer.fee.toFixed(2).replace('.', ','),
+      formatDate(transfer.transferDate),
+      formatDate(transfer.scheduleDate),
+      getStatusText(transfer.transferDate)
+    ])
+
+    // Combine headers and rows
+    const csvContent = [headers, ...csvRows]
+      .map(row => row.map(field => `"${field}"`).join(';'))
+      .join('\n')
+
+    // Add BOM for proper encoding in Excel
+    const BOM = '\uFEFF'
+    const csvWithBOM = BOM + csvContent
+
+    // Create and download the file
+    const blob = new Blob([csvWithBOM], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    
+    link.setAttribute('href', url)
+    link.setAttribute('download', `transferencias_${new Date().toISOString().split('T')[0]}.csv`)
+    link.style.visibility = 'hidden'
+    
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    
+    URL.revokeObjectURL(url)
+    
+    toast.success('Arquivo CSV baixado com sucesso!')
+  } catch (error) {
+    console.error('Erro ao gerar CSV:', error)
+    toast.error('Erro ao gerar arquivo CSV')
+  }
 }
 </script>
