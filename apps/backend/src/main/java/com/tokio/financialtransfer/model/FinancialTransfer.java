@@ -1,5 +1,7 @@
 package com.tokio.financialtransfer.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +18,8 @@ import java.time.LocalDateTime;
 @Table(name = "financial_transfers")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class FinancialTransfer {
 
     @Id
@@ -48,16 +52,6 @@ public class FinancialTransfer {
     @NotNull(message = "Data de agendamento é obrigatória")
     @Column(name = "schedule_date", nullable = false)
     private LocalDateTime scheduleDate;
-
-    public FinancialTransfer(String sourceAccount, String destinationAccount, 
-                           BigDecimal transferAmount, BigDecimal fee, LocalDate transferDate) {
-        this.sourceAccount = sourceAccount;
-        this.destinationAccount = destinationAccount;
-        this.transferAmount = transferAmount;
-        this.fee = fee;
-        this.transferDate = transferDate;
-        this.scheduleDate = LocalDateTime.now();
-    }
 
     @PrePersist
     private void prePersist() {

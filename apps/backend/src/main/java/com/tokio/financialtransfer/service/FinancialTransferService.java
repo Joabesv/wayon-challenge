@@ -34,13 +34,13 @@ public class FinancialTransferService {
         LoggingContext.set(LoggingContext.FEE_AMOUNT, fee);
         log.debug("Fee calculated for transfer");
         
-        FinancialTransfer transfer = new FinancialTransfer(
-            request.getSourceAccount(),
-            request.getDestinationAccount(),
-            request.getTransferAmount(),
-            fee,
-            request.getTransferDate()
-        );
+        FinancialTransfer transfer = FinancialTransfer.builder()
+                .sourceAccount(request.getSourceAccount())
+                .destinationAccount(request.getDestinationAccount())
+                .transferAmount(request.getTransferAmount())
+                .fee(fee)
+                .transferDate(request.getTransferDate())
+                .build();
 
         FinancialTransfer savedTransfer = repository.save(transfer);
         
