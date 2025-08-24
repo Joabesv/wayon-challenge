@@ -128,24 +128,54 @@
               </div>
             </CardContent>
 
-            <CardFooter class="flex justify-between space-x-4">
-              <Button
-                type="button"
-                @click="calculateFee"
-                :disabled="!meta.valid"
-                variant="outline"
-                class="flex-1"
-              >
-                Calcular Taxa
-              </Button>
+            <CardFooter class="flex flex-col space-y-4">
+              <!-- Step indicator -->
+              <div class="w-full flex items-center justify-center space-x-4 text-sm">
+                <div class="flex items-center space-x-2">
+                  <div class="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">
+                    1
+                  </div>
+                  <span class="text-muted-foreground">Preencher dados</span>
+                </div>
+                <div class="w-8 h-px bg-border"></div>
+                <div class="flex items-center space-x-2">
+                  <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium"
+                       :class="calculatedFee !== null ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'">
+                    2
+                  </div>
+                  <span :class="calculatedFee !== null ? 'text-foreground' : 'text-muted-foreground'">Calcular taxa</span>
+                </div>
+                <div class="w-8 h-px bg-border"></div>
+                <div class="flex items-center space-x-2">
+                  <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium"
+                       :class="calculatedFee !== null ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'">
+                    3
+                  </div>
+                  <span :class="calculatedFee !== null ? 'text-foreground' : 'text-muted-foreground'">Confirmar transferência</span>
+                </div>
+              </div>
 
-              <Button
-                type="submit"
-                :disabled="!meta.valid || calculatedFee === null"
-                class="flex-1"
-              >
-                Transferir
-              </Button>              
+              <!-- Action buttons -->
+              <div class="flex justify-between space-x-4 w-full">
+                <Button
+                  type="button"
+                  @click="calculateFee"
+                  :disabled="!meta.valid"
+                  variant="outline"
+                  class="flex-1"
+                >
+                  {{ calculatedFee === null ? 'Calcular Taxa' : 'Recalcular Taxa' }}
+                </Button>
+
+                <Button
+                  type="submit"
+                  :disabled="!meta.valid || calculatedFee === null"
+                  class="flex-1"
+                  :class="calculatedFee === null ? 'opacity-50' : ''"
+                >
+                  {{ calculatedFee === null ? 'Confirme a taxa primeiro' : 'Confirmar Transferência' }}
+                </Button>              
+              </div>
             </CardFooter>
           </form>
         </Card>
@@ -163,7 +193,7 @@ import { useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { toast, Toaster } from 'vue-sonner'
-import { X } from 'lucide-vue-next'
+import { X, Info } from 'lucide-vue-next'
 
 import { useCreateTransfer, useCalculateFee } from '@/services/queries'
 import { transferFormSchema } from '@/lib/schemas'
