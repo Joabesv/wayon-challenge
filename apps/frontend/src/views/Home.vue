@@ -41,100 +41,111 @@
             <CardContent>
               <div class="space-y-6">
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                  <FormField>
-                    <Label for="sourceAccount">
-                      Conta de Origem
-                    </Label>
-                    <Input
-                      id="sourceAccount"
-                      v-model="sourceAccount"
-                      placeholder="0000000000"
-                      maxlength="10"
-                      :class="shouldShowError('sourceAccount') ? 'border-destructive' : ''"
-                    />
-                    <FormDescription>10 dígitos</FormDescription>
-                    <FormMessage :message="shouldShowError('sourceAccount') ? errors.sourceAccount : ''" />
+                  <FormField v-slot="{ componentField }" name="sourceAccount">
+                    <FormItem>
+                      <FormLabel>Conta de Origem</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="0000000000"
+                          maxlength="10"
+                          v-bind="componentField"
+                        />
+                      </FormControl>
+                      <FormDescription>10 dígitos</FormDescription>
+                      <FormMessage />
+                    </FormItem>
                   </FormField>
 
-                  <FormField>
-                    <Label for="destinationAccount">
-                      Conta de Destino
-                    </Label>
-                    <Input
-                      id="destinationAccount"
-                      v-model="destinationAccount"
-                      placeholder="0000000000"
-                      maxlength="10"
-                      :class="shouldShowError('destinationAccount') ? 'border-destructive' : ''"
-                    />
-                    <FormDescription>10 dígitos</FormDescription>
-                    <FormMessage :message="shouldShowError('destinationAccount') ? errors.destinationAccount : ''" />
+                  <FormField v-slot="{ componentField }" name="destinationAccount">
+                    <FormItem>
+                      <FormLabel>Conta de Destino</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="0000000000"
+                          maxlength="10"
+                          v-bind="componentField"
+                        />
+                      </FormControl>
+                      <FormDescription>10 dígitos</FormDescription>
+                      <FormMessage />
+                    </FormItem>
                   </FormField>
                 </div>
 
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                  <FormField>
-                    <Label for="transferAmount">
-                      Valor da Transferência
-                    </Label>
-                    <NumberField 
-                      v-model="transferAmount"
-                      :min="0.01"
-                      :step="0.01"
-                      :format-options="{
-                        style: 'currency',
-                        currency: 'BRL'
-                      }"
-                    >
-                      <NumberFieldContent />
-                    </NumberField>
-                    <FormMessage :message="shouldShowError('transferAmount') ? errors.transferAmount : ''" />
+                  <FormField v-slot="{ componentField }" name="transferAmount">
+                    <FormItem>
+                      <FormLabel>Valor da Transferência</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="0.01"
+                          :min="0.01"
+                          :step="0.01"
+                          v-bind="componentField"
+                        />
+                      </FormControl>
+                      <FormDescription class="mb-3">Valor mínimo: R$ 0,01</FormDescription>
+                      <FormMessage />
+                    </FormItem>
                   </FormField>
 
-                  <FormField>
-                    <Label for="transferDate">
-                      Data da Transferência
-                    </Label>
-                    <DatePicker
-                      v-model="transferDate"
-                      :min-date="today.toISOString().split('T')[0]"
-                      placeholder="Selecione uma data"
-                      :class="shouldShowError('transferDate') ? 'border-destructive' : ''"
-                    />
-                    <FormMessage :message="shouldShowError('transferDate') ? errors.transferDate : ''" />
+                  <FormField v-slot="{ componentField }" name="transferDate">
+                    <FormItem>
+                      <FormLabel>Data da Transferência</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          :min="today.toISOString().split('T')[0]"
+                          v-bind="componentField"
+                        />
+                      </FormControl>
+                      <FormDescription class="mb-3">Data não pode ser anterior a hoje</FormDescription>
+                      <FormMessage />
+                    </FormItem>
                   </FormField>
                 </div>
 
-                <Alert v-if="calculatedFee !== null" variant="default" class="border-blue-200 bg-blue-50">
-                  <div class="space-y-2">
-                    <h4 class="font-medium text-blue-800">Resumo da Transferência</h4>
-                    <div class="text-sm text-blue-700 space-y-1">
-                      <p>Valor: {{ formatCurrency(transferAmount ?? 0) }}</p>
-                      <p>Taxa: {{ formatCurrency(calculatedFee) }}</p>
-                      <p class="font-semibold border-t pt-1">
-                        Total: {{ formatCurrency((transferAmount ?? 0) + calculatedFee) }}
-                      </p>
-                    </div>
-                  </div>
+                <Alert v-if="calculatedFee !== null" variant="default" class="border-blue-200 bg-blue-50 mb-2 relative">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    class="absolute top-2 right-2 h-6 w-6 p-0 hover:bg-blue-100"
+                    @click="calculatedFee = null"
+                  >
+                    <span class="sr-only">Fechar</span>
+                    <X class="h-4 w-4" />
+                  </Button>
+                  <AlertTitle class="font-medium text-blue-800 pr-8">Resumo da Transferência</AlertTitle>
+                  <AlertDescription class="text-sm text-blue-700 space-y-1">
+                    <p>Valor: {{ formatCurrency(typeof values.transferAmount === 'string' ? parseFloat(values.transferAmount) || 0 : values.transferAmount || 0) }}</p>
+                    <p>Taxa: {{ formatCurrency(calculatedFee) }}</p>
+                    <p class="font-semibold border-t pt-1">
+                      Total: {{ formatCurrency((typeof values.transferAmount === 'string' ? parseFloat(values.transferAmount) || 0 : values.transferAmount || 0) + calculatedFee) }}
+                    </p>
+                  </AlertDescription>
                 </Alert>
               </div>
             </CardContent>
 
-            <CardFooter class="flex justify-end space-x-3">
+            <CardFooter class="flex justify-between space-x-4">
               <Button
                 type="button"
+                @click="calculateFee"
+                :disabled="!meta.valid"
                 variant="outline"
-                @click="handleCalculateFee"
-                :disabled="!canCalculateFee || isCalculatingFee"
+                class="flex-1"
               >
-                {{ isCalculatingFee ? 'Calculando...' : 'Calcular Taxa' }}
+                Calcular Taxa
               </Button>
+
               <Button
                 type="submit"
-                :disabled="!isValid || calculatedFee === null || isCreatingTransfer"
+                :disabled="!meta.valid || calculatedFee === null"
+                class="flex-1"
               >
-                {{ isCreatingTransfer ? 'Agendando...' : 'Agendar Transferência' }}
-              </Button>
+                Transferir
+              </Button>              
             </CardFooter>
           </form>
         </Card>
@@ -147,108 +158,61 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { toast, Toaster } from 'vue-sonner'
-
-import Card from '@/components/ui/Card.vue'
-import CardHeader from '@/components/ui/CardHeader.vue'
-import CardTitle from '@/components/ui/CardTitle.vue'
-import CardContent from '@/components/ui/CardContent.vue'
-import CardFooter from '@/components/ui/CardFooter.vue'
-import Button from '@/components/ui/Button.vue'
-import Input from '@/components/ui/Input.vue'
-import Label from '@/components/ui/Label.vue'
-import Alert from '@/components/ui/Alert.vue'
-import NumberField from '@/components/ui/NumberField.vue'
-import NumberFieldContent from '@/components/ui/NumberFieldContent.vue'
-import DatePicker from '@/components/ui/DatePicker.vue'
-import FormField from '@/components/ui/FormField.vue'
-import FormMessage from '@/components/ui/FormMessage.vue'
-import FormDescription from '@/components/ui/FormDescription.vue'
+import { X } from 'lucide-vue-next'
 
 import { useCreateTransfer, useCalculateFee } from '@/services/queries'
 import { transferFormSchema } from '@/lib/schemas'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormDescription,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
 
 const router = useRouter()
 
-// Use vee-validate's recommended approach - simpler and more reliable
-const { handleSubmit, values, errors, setFieldValue } = useForm({
+const { handleSubmit, values, meta, resetForm } = useForm({
   validationSchema: toTypedSchema(transferFormSchema),
   initialValues: {
     sourceAccount: '',
     destinationAccount: '',
-    transferAmount: 0.01,
+    transferAmount: '0.01',
     transferDate: undefined
   }
 })
 
-const sourceAccount = computed({
-  get: () => values.sourceAccount,
-  set: (value: string) => setFieldValue('sourceAccount', value)
-})
-
-const destinationAccount = computed({
-  get: () => values.destinationAccount,
-  set: (value: string) => setFieldValue('destinationAccount', value)
-})
-
-const transferAmount = computed({
-  get: () => values.transferAmount,
-  set: (value: number) => setFieldValue('transferAmount', value)
-})
-
-const transferDate = computed({
-  get: () => values.transferDate ? values.transferDate.toISOString().split('T')[0] : '',
-  set: (value: string) => setFieldValue('transferDate', value ? new Date(value) : undefined)
-})
-
-// Simplify - remove custom touched logic and use vee-validate's built-in state
-const shouldShowError = (fieldName: keyof typeof errors.value) => {
-  return errors.value[fieldName]
-}
-
-const { mutateAsync: createTransferMutation, isPending: isCreatingTransfer } = useCreateTransfer()
-const { mutateAsync: calculateFeeMutation, isPending: isCalculatingFee } = useCalculateFee()
+const { mutateAsync: createTransferMutation } = useCreateTransfer()
+const { mutateAsync: calculateFeeMutation } = useCalculateFee()
 
 const calculatedFee = ref<number | null>(null)
 const today = new Date()
 
-const canCalculateFee = computed(() => {
-  return (transferAmount.value ?? 0) >= 0.01 && values.transferDate !== undefined
-})
-
-const isValid = computed(() => {
-  // Simple validation - just check if fields have valid values and no errors
-  const hasValidSourceAccount = (sourceAccount.value || '').length === 10
-  const hasValidDestinationAccount = (destinationAccount.value || '').length === 10  
-  const hasValidAmount = (transferAmount.value ?? 0) >= 0.01
-  const hasValidDate = values.transferDate !== undefined
-  
-  const hasNoErrors = Object.keys(errors.value).length === 0
-  
-  return hasValidSourceAccount && 
-         hasValidDestinationAccount && 
-         hasValidAmount && 
-         hasValidDate &&
-         hasNoErrors
-})
-
-const handleCalculateFee = async () => {
-  if (!canCalculateFee.value) {
-    toast.error('Preencha o valor e a data para calcular a taxa')
+const calculateFee = async () => {
+  if (!meta.value.valid) {
+    toast.error('Preencha todos os campos corretamente para calcular a taxa')
     return
   }
 
   try {
+    const amount = typeof values.transferAmount === 'string' ? parseFloat(values.transferAmount) : values.transferAmount
+    const dateValue = typeof values.transferDate === 'string' ? new Date(values.transferDate) : values.transferDate
+    
     const fee = await calculateFeeMutation({
-      transferAmount: transferAmount.value ?? 0,
-      transferDate: values.transferDate!.toISOString().split('T')[0]
+      transferAmount: amount || 0,
+      transferDate: dateValue!.toISOString().split('T')[0]
     })
     calculatedFee.value = fee
-    toast.success('Taxa calculada com sucesso!')
   } catch (error) {
     toast.error('Erro ao calcular taxa. Tente novamente.')
     console.error('Fee calculation error:', error)
@@ -262,24 +226,22 @@ const onSubmit = handleSubmit(async (formValues) => {
   }
 
   try {
+    const amount = typeof formValues.transferAmount === 'string' ? parseFloat(formValues.transferAmount) : formValues.transferAmount
+    const dateValue = typeof formValues.transferDate === 'string' ? new Date(formValues.transferDate) : formValues.transferDate
+    
     await createTransferMutation({
       sourceAccount: formValues.sourceAccount,
       destinationAccount: formValues.destinationAccount,
-      transferAmount: formValues.transferAmount,
-      transferDate: formValues.transferDate!.toISOString().split('T')[0]
+      transferAmount: amount,
+      transferDate: dateValue!.toISOString().split('T')[0]
     })
 
     toast.success('Transferência agendada com sucesso!', {
-      description: `Valor: ${formatCurrency(formValues.transferAmount)} + Taxa: ${formatCurrency(calculatedFee.value)}`
+      description: `Valor: ${formatCurrency(amount)} + Taxa: ${formatCurrency(calculatedFee.value)}`
     })
 
     calculatedFee.value = null
-    
-    // Reset form manually since we're not using the resetForm from destructuring
-    setFieldValue('sourceAccount', '')
-    setFieldValue('destinationAccount', '')
-    setFieldValue('transferAmount', 0.01)
-    setFieldValue('transferDate', undefined)
+    resetForm()
 
     setTimeout(() => {
       router.push('/transfers')
