@@ -1,0 +1,85 @@
+type: collection.insomnia.rest/5.0
+name: Financial Transfer API
+meta:
+  id: wrk_7cbf0661a922410daea1a34ca70104f8
+  created: 1754957605695
+  modified: 1754957605695
+  description: ""
+collection:
+  - url: http://localhost:8080/api/transfers
+    name: Create transfer
+    meta:
+      id: req_7444b3343e73474ba0d44caaf9031813
+      created: 1755994888587
+      modified: 1755995121874
+      isPrivate: false
+      description: ""
+      sortKey: -1755994888587
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"sourceAccount": "1234567890",
+        	"destinationAccount": "0987654321",
+        	"transferAmount": 1000.00,
+        	"transferDate": "2025-08-30"
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/11.2.0
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: http://localhost:8080/api/transfers
+    name: List transfer
+    meta:
+      id: req_80f4c39c1246492f844f28ab89eb210e
+      created: 1755995125461
+      modified: 1755995127306
+      isPrivate: false
+      description: ""
+      sortKey: -1755439634414
+    method: GET
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"sourceAccount": "1234567890",
+        	"destinationAccount": "0987654321",
+        	"transferAmount": 1000.00,
+        	"transferDate": "2025-08-30"
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/11.2.0
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_2d1802278d754004bb91bbd02e1eabd0
+    created: 1754263848551
+    modified: 1754263848551
+environments:
+  name: Base Environment
+  meta:
+    id: env_58d4e8dff97a4e7c862fc246b57fcd1f
+    created: 1754263848550
+    modified: 1754263848550
+    isPrivate: false
