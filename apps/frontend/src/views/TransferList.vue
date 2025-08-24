@@ -130,9 +130,8 @@
               </div>
 
               <Alert variant="default" class="border-gray-200 bg-gray-50">
-                <div>
-                  <h4 class="font-medium text-gray-800 mb-2">Resumo</h4>
-                  <div class="grid grid-cols-2 gap-4 text-sm">
+                  <AlertTitle class="font-medium text-gray-800 mb-2">Resumo</AlertTitle>
+                  <AlertDescription class="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <p class="text-muted-foreground">Total de Transferências:</p>
                       <p class="font-semibold">{{ transfers?.length || 0 }}</p>
@@ -141,8 +140,7 @@
                       <p class="text-muted-foreground">Valor Total:</p>
                       <p class="font-semibold">{{ formatCurrency(totalAmount) }}</p>
                     </div>
-                  </div>
-                </div>
+                  </AlertDescription>
               </Alert>
 
               <div class="flex justify-end">
@@ -160,20 +158,15 @@
       </div>
     </main>
 
-    <!-- Toaster for notifications -->
     <Toaster position="top-right" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
-
-import Card from '@/components/ui/Card.vue'
-import CardHeader from '@/components/ui/CardHeader.vue'
-import CardTitle from '@/components/ui/CardTitle.vue'
-import CardContent from '@/components/ui/CardContent.vue'
-import Button from '@/components/ui/Button.vue'
-import Alert from '@/components/ui/Alert.vue'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Toaster } from 'vue-sonner'
 
 import { useTransfers } from '@/services/queries'
@@ -231,10 +224,11 @@ const getStatusText = (transferDate: string): string => {
   
   if (transfer < today) {
     return 'Processada'
-  } else if (transfer.toDateString() === today.toDateString()) {
+  } 
+  if (transfer.toDateString() === today.toDateString()) {
     return 'Hoje'
-  } else {
-    return 'Agendada'
-  }
+  } 
+
+  return 'Agendada'
 }
 </script>
