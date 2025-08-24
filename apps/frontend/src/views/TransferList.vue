@@ -1,25 +1,27 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <nav class="bg-white shadow-sm border-b">
+  <div class="min-h-screen bg-background">
+    <nav class="bg-card shadow-sm border-b">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
+        <div class="flex justify-between items-center h-16">
           <div class="flex items-center">
-            <h1 class="text-xl font-semibold text-gray-900">
-              Sistema de Transferências Financeiras
+            <h1 class="text-lg sm:text-xl font-semibold text-foreground truncate">
+              <span class="hidden sm:inline">Sistema de Transferências Financeiras</span>
+              <span class="sm:hidden">Transferências</span>
             </h1>
           </div>
-          <div class="flex items-center space-x-4">
+          <div class="flex items-center space-x-2 sm:space-x-4">
             <router-link
               to="/"
-              class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-              :class="{ 'bg-gray-100 text-gray-900': $route.name === 'home' }"
+              class="text-muted-foreground hover:text-foreground px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors"
+              :class="{ 'bg-accent text-accent-foreground': $route.name === 'home' }"
             >
-              Nova Transferência
+              <span class="hidden sm:inline">Nova Transferência</span>
+              <span class="sm:hidden">Nova</span>
             </router-link>
             <router-link
               to="/transfers"
-              class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-              :class="{ 'bg-gray-100 text-gray-900': $route.name === 'transfers' }"
+              class="text-muted-foreground hover:text-foreground px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors"
+              :class="{ 'bg-accent text-accent-foreground': $route.name === 'transfers' }"
             >
               Extrato
             </router-link>
@@ -28,27 +30,29 @@
       </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-      <div class="px-4 py-6 sm:px-0">
-        <Card class="max-w-6xl mx-auto">
-          <CardHeader>
-            <div class="flex justify-between items-center">
-              <CardTitle class="text-2xl">
+    <main class="max-w-7xl mx-auto py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
+      <div class="sm:px-0">
+        <Card class="max-w-full mx-auto">
+          <CardHeader class="pb-4 sm:pb-6">
+            <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
+              <CardTitle class="text-xl sm:text-2xl text-center sm:text-left">
                 Extrato de Transferências
               </CardTitle>
               <Button 
                 v-if="transfers?.length"
                 variant="outline" 
                 @click="downloadCSV"
-                class="flex items-center gap-2"
+                class="flex items-center gap-2 self-center sm:self-auto"
+                size="sm"
               >
                 <DownloadIcon class="h-4 w-4" />
-                Baixar CSV
+                <span class="hidden sm:inline">Baixar CSV</span>
+                <span class="sm:hidden">CSV</span>
               </Button>
             </div>
           </CardHeader>
           
-          <CardContent>
+          <CardContent class="px-4 sm:px-6">
             <div v-if="isLoading" class="text-center py-8">
               <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
               <p class="text-muted-foreground">Carregando transferências...</p>
@@ -80,85 +84,129 @@
             </div>
 
             <div v-else class="space-y-6">
-              <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-                <table class="min-w-full divide-y divide-gray-300">
-                  <thead class="bg-gray-50">
-                    <tr>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        ID
-                      </th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Conta Origem
-                      </th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Conta Destino
-                      </th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Valor
-                      </th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Taxa
-                      </th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Data Transferência
-                      </th>
-                      <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="transfer in transfers" :key="transfer.id" class="hover:bg-gray-50">
-                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        #{{ transfer.id }}
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {{ formatAccount(transfer.sourceAccount) }}
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {{ formatAccount(transfer.destinationAccount) }}
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {{ formatCurrency(transfer.transferAmount) }}
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {{ formatCurrency(transfer.fee) }}
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {{ formatDate(transfer.transferDate) }}
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <span 
-                          class="inline-flex px-2 py-1 text-xs font-medium rounded-full"
-                          :class="getStatusClass(transfer.transferDate)"
-                        >
-                          {{ getStatusText(transfer.transferDate) }}
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+              <!-- Mobile card layout -->
+              <div class="block sm:hidden space-y-4">
+                <div 
+                  v-for="transfer in transfers" 
+                  :key="transfer.id" 
+                  class="bg-card border rounded-lg p-4 space-y-3"
+                >
+                  <div class="flex justify-between items-start">
+                    <div>
+                      <p class="font-medium text-foreground">#{{ transfer.id }}</p>
+                      <span 
+                        class="inline-flex px-2 py-1 text-xs font-medium rounded-full"
+                        :class="getStatusClass(transfer.transferDate)"
+                      >
+                        {{ getStatusText(transfer.transferDate) }}
+                      </span>
+                    </div>
+                    <div class="text-right">
+                      <p class="font-semibold text-foreground">{{ formatCurrency(transfer.transferAmount) }}</p>
+                      <p class="text-xs text-muted-foreground">+ {{ formatCurrency(transfer.fee) }} taxa</p>
+                    </div>
+                  </div>
+                  
+                  <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                      <span class="text-muted-foreground">Origem:</span>
+                      <span class="text-foreground">{{ formatAccount(transfer.sourceAccount) }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-muted-foreground">Destino:</span>
+                      <span class="text-foreground">{{ formatAccount(transfer.destinationAccount) }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-muted-foreground">Data:</span>
+                      <span class="text-foreground">{{ formatDate(transfer.transferDate) }}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <Alert variant="default" class="border-gray-200 bg-gray-50">
-                  <AlertTitle class="font-medium text-gray-800 mb-2">Resumo</AlertTitle>
-                  <AlertDescription class="grid grid-cols-2 gap-4 text-sm">
+              <!-- Desktop table layout -->
+              <div class="hidden sm:block overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                <div class="overflow-x-auto">
+                  <table class="min-w-full divide-y divide-border">
+                    <thead class="bg-muted/50">
+                      <tr>
+                        <th scope="col" class="px-3 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                          ID
+                        </th>
+                        <th scope="col" class="px-3 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                          Conta Origem
+                        </th>
+                        <th scope="col" class="px-3 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                          Conta Destino
+                        </th>
+                        <th scope="col" class="px-3 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                          Valor
+                        </th>
+                        <th scope="col" class="px-3 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                          Taxa
+                        </th>
+                        <th scope="col" class="px-3 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                          Data
+                        </th>
+                        <th scope="col" class="px-3 lg:px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                          Status
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="bg-card divide-y divide-border">
+                      <tr v-for="transfer in transfers" :key="transfer.id" class="hover:bg-muted/50">
+                        <td class="px-3 lg:px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
+                          #{{ transfer.id }}
+                        </td>
+                        <td class="px-3 lg:px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                          {{ formatAccount(transfer.sourceAccount) }}
+                        </td>
+                        <td class="px-3 lg:px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                          {{ formatAccount(transfer.destinationAccount) }}
+                        </td>
+                        <td class="px-3 lg:px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                          {{ formatCurrency(transfer.transferAmount) }}
+                        </td>
+                        <td class="px-3 lg:px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                          {{ formatCurrency(transfer.fee) }}
+                        </td>
+                        <td class="px-3 lg:px-6 py-4 whitespace-nowrap text-sm text-foreground">
+                          {{ formatDate(transfer.transferDate) }}
+                        </td>
+                        <td class="px-3 lg:px-6 py-4 whitespace-nowrap">
+                          <span 
+                            class="inline-flex px-2 py-1 text-xs font-medium rounded-full"
+                            :class="getStatusClass(transfer.transferDate)"
+                          >
+                            {{ getStatusText(transfer.transferDate) }}
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <Alert variant="default" class="border-border bg-muted/50">
+                  <AlertTitle class="font-medium text-foreground mb-2">Resumo</AlertTitle>
+                  <AlertDescription class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-sm">
                     <div>
                       <p class="text-muted-foreground">Total de Transferências:</p>
-                      <p class="font-semibold">{{ transfers?.length || 0 }}</p>
+                      <p class="font-semibold text-foreground">{{ transfers?.length || 0 }}</p>
                     </div>
                     <div>
                       <p class="text-muted-foreground">Valor Total:</p>
-                      <p class="font-semibold">{{ formatCurrency(totalAmount) }}</p>
+                      <p class="font-semibold text-foreground">{{ formatCurrency(totalAmount) }}</p>
                     </div>
                   </AlertDescription>
               </Alert>
 
-              <div class="flex justify-end">
+              <div class="flex justify-center sm:justify-end">
                 <Button 
                   variant="outline" 
                   @click="refetch"
                   :disabled="isRefetching"
+                  size="sm"
                 >
                   {{ isRefetching ? 'Atualizando...' : 'Atualizar' }}
                 </Button>
