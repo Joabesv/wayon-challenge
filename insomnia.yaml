@@ -1,5 +1,5 @@
 type: collection.insomnia.rest/5.0
-name: Financial Transfer API
+name: My Collection
 meta:
   id: wrk_7cbf0661a922410daea1a34ca70104f8
   created: 1754957605695
@@ -56,6 +56,36 @@ collection:
         	"destinationAccount": "0987654321",
         	"transferAmount": 1000.00,
         	"transferDate": "2025-08-30"
+        }
+    headers:
+      - name: Content-Type
+        value: application/json
+      - name: User-Agent
+        value: insomnia/11.2.0
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: http://localhost:8080/api/transfers/calculate-fee
+    name: Calc fee
+    meta:
+      id: req_77ceea16c57b4e6dadc64e3591eccb34
+      created: 1755996614507
+      modified: 1756050507618
+      isPrivate: false
+      description: ""
+      sortKey: -1755996614507
+    method: POST
+    body:
+      mimeType: application/json
+      text: |-
+        {
+        	"transferAmount": 44.00,
+        	"transferDate": "2025-08-24"
         }
     headers:
       - name: Content-Type
