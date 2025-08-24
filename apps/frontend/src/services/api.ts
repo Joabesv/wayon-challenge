@@ -1,7 +1,9 @@
 import { ofetch } from 'ofetch'
 
+const baseURL = import.meta.env.BASE_URL ?? 'http://localhost:8080/api'
+
 const api = ofetch.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL,
 })
 
 type BaseApiResponse<T> = {

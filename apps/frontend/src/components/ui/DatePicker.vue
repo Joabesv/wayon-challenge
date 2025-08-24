@@ -12,11 +12,12 @@
         {{ calendarValue ? df.format(calendarValue.toDate(getLocalTimeZone())) : placeholder }}
       </Button>
     </PopoverTrigger>
-    <PopoverContent class="w-auto p-0" align="start">
+    <PopoverContent class="w-auto p-0 max-w-[calc(100vw-2rem)] sm:max-w-none" align="start">
       <Calendar
         v-model="calendarValue"
         :is-date-disabled="handleIsDateDisabled"
         initial-focus
+        class="w-fit"
       />
     </PopoverContent>
   </Popover>
