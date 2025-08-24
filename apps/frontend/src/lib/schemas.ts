@@ -15,23 +15,14 @@ export const transferFormSchema = z.object({
     .pipe(z.number().min(0.01, 'Valor deve ser maior que zero').max(999999.99, 'Valor muito alto')),
   
   transferDate: z
-    .union([z.string(), z.date()])
-    .transform((val) => {
-      if (typeof val === 'string') {
-        return val ? new Date(val) : undefined
-      }
-      return val
+    .date({
+      required_error: 'Data da transferência é obrigatória'
     })
-    .pipe(
-      z.date({
-        required_error: 'Data da transferência é obrigatória'
-      })
-      .refine((date: Date) => {
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
-        return date >= today
-      }, 'Data da transferência não pode ser anterior à data atual')
-    )
+    .refine((date: Date) => {
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      return date >= today
+    }, 'Data da transferência não pode ser anterior à data atual')
     .optional()
 })
 

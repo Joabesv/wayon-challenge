@@ -94,14 +94,17 @@
                     <FormItem>
                       <FormLabel>Data da Transferência</FormLabel>
                       <FormControl>
-                        <Input
-                          type="date"
-                          :min="today.toISOString().split('T')[0]"
+                        <DatePicker
                           v-bind="componentField"
+                          placeholder="Selecione a data da transferência"
+                          :disabled-date="(date) => {
+                            const today = new Date()
+                            today.setHours(0, 0, 0, 0)
+                            return date < today
+                          }"
                         />
-                      </FormControl>
-                      <FormDescription class="mb-3">Data não pode ser anterior a hoje</FormDescription>
-                      <FormMessage />
+                      </FormControl >
+                      <FormMessage class="mb-3"/>
                     </FormItem>
                   </FormField>
                 </div>
@@ -207,6 +210,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import DatePicker from '@/components/ui/DatePicker.vue'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 
@@ -218,7 +222,7 @@ const { handleSubmit, values, meta, resetForm } = useForm({
     sourceAccount: '',
     destinationAccount: '',
     transferAmount: '0.01',
-    transferDate: undefined
+    transferDate: undefined as Date | undefined
   }
 })
 
@@ -226,7 +230,6 @@ const { mutateAsync: createTransferMutation } = useCreateTransfer()
 const { mutateAsync: calculateFeeMutation } = useCalculateFee()
 
 const calculatedFee = ref<number | null>(null)
-const today = new Date()
 
 const calculateFee = async () => {
   if (!meta.value.valid) {
@@ -236,11 +239,10 @@ const calculateFee = async () => {
 
   try {
     const amount = typeof values.transferAmount === 'string' ? parseFloat(values.transferAmount) : values.transferAmount
-    const dateValue = typeof values.transferDate === 'string' ? new Date(values.transferDate) : values.transferDate
     
     const fee = await calculateFeeMutation({
       transferAmount: amount || 0,
-      transferDate: dateValue!.toISOString().split('T')[0]
+      transferDate: values.transferDate!.toISOString().split('T')[0]
     })
     calculatedFee.value = fee
   } catch (error) {
@@ -257,13 +259,12 @@ const onSubmit = handleSubmit(async (formValues) => {
 
   try {
     const amount = typeof formValues.transferAmount === 'string' ? parseFloat(formValues.transferAmount) : formValues.transferAmount
-    const dateValue = typeof formValues.transferDate === 'string' ? new Date(formValues.transferDate) : formValues.transferDate
     
     await createTransferMutation({
       sourceAccount: formValues.sourceAccount,
       destinationAccount: formValues.destinationAccount,
       transferAmount: amount,
-      transferDate: dateValue!.toISOString().split('T')[0]
+      transferDate: formValues.transferDate!.toISOString().split('T')[0]
     })
 
     toast.success('Transferência agendada com sucesso!', {
