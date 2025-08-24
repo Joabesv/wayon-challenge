@@ -3,13 +3,11 @@ import { z } from 'zod'
 export const transferFormSchema = z.object({
   sourceAccount: z
     .string()
-    .min(1, 'Conta de origem é obrigatória')
-    .regex(/^\d{10}$/, 'Conta de origem deve ter exatamente 10 dígitos'),
+    .refine((val) => val === '' || /^\d{10}$/.test(val), 'Conta de origem deve ter exatamente 10 dígitos'),
   
   destinationAccount: z
     .string()
-    .min(1, 'Conta de destino é obrigatória')
-    .regex(/^\d{10}$/, 'Conta de destino deve ter exatamente 10 dígitos'),
+    .refine((val) => val === '' || /^\d{10}$/.test(val), 'Conta de destino deve ter exatamente 10 dígitos'),
   
   transferAmount: z
     .number()
@@ -25,6 +23,7 @@ export const transferFormSchema = z.object({
       today.setHours(0, 0, 0, 0)
       return date >= today
     }, 'Data da transferência não pode ser anterior à data atual')
+    .optional()
 })
 
 
