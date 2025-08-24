@@ -1,0 +1,11 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "mvn spring-boot:run | jq -R '. as $line | try (fromjson) catch $line'",
+    "build": "mvn clean package",
+    "test": "mvn test",
+    "lint": "echo 'Java linting with checkstyle can be added later'"
+  }
+}
